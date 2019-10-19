@@ -19,8 +19,6 @@ class CommentsGetter:
         elif len(comments) > self.MAX_COMMENT_COUNT:
             return comments
 
-        print(len(comments))
-
         if nextPageToken is None:
             request = self.YouTube.commentThreads().list(
                 part="id",
@@ -50,13 +48,16 @@ class CommentsGetter:
         request = self.YouTube.comments().list(part="snippet", id=item)
         res = request.execute()
         self.progress = self.progress + 1
-        print(self.progress)
+
+        if (self.progress % 100 == 0):
+            print(self.progress)
+
         return res["items"][0]["snippet"]["textDisplay"]
 
     def start(self):
-        print("Start")
+        print("Start gettng comment from video: " + self.VideoId)
         comments = map(self.__getComment, self.__getCommentListFromVideoId(None, None))
-        f = open(self.VideoId + ".txt", "w")
+        f = open("comments/" + self.VideoId + ".json", "w")
         f.write(json.dumps(list(comments)))
         print("done")
 
